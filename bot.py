@@ -36,20 +36,21 @@ class Music:
 
     def download_music(self, file_name, link):
         ydl_opts = {
-            'outtmpl': './'+file_name,
+            'outtmpl': f'./{file_name}',
             'format': 'bestaudio/best',
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '256',
-            }],
-            'prefer_ffmpeg': True
+            'postprocessors': [
+                {
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '256',
+                }
+            ],
+            'prefer_ffmpeg': True,
         }
+
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=True)
-
-        pass
 
 class Chat:
     def __init__(self, msg):
@@ -60,29 +61,25 @@ class Chat:
         self.message_id = msg['message_id']
 
         self.messages = {
-            'start':'🤖 Hello, '+ self.user_name +'!\n\n'
-                    '📩 Send me:\n\n'
-                    '"*/music* _song name_"  or\n'
-                    '"*/music* _musician name - song name_"\n\n'
-                    'to order some music. 🎶',
-            
-            'spotify_input_error':"‼️ *Oops! The bot doesn't support Spotify links!*\n"
-                    'Try: "*/music* _song name_"\n'
-                    'or: "*/music* _musician name - song name_"',
-
-            'invalid_command':'‼️ *Oops! Invalid command!*\n'
-                    'Try: "*/music* _song name_"\n'
-                    'or: "*/music* _musician name - song name_"',
-
-            'too_long':'‼️ *Oops! Video too long to convert!*\n'
-                    'Order something 30 minutes or less.'
-
-
+            'start': (
+                f'🤖 Hello, {self.user_name}' + '!\n\n'
+                '📩 Send me:\n\n'
+                '"*/music* _song name_"  or\n'
+                '"*/music* _musician name - song name_"\n\n'
+                'to order some music. 🎶'
+            ),
+            'spotify_input_error': "‼️ *Oops! The bot doesn't support Spotify links!*\n"
+            'Try: "*/music* _song name_"\n'
+            'or: "*/music* _musician name - song name_"',
+            'invalid_command': '‼️ *Oops! Invalid command!*\n'
+            'Try: "*/music* _song name_"\n'
+            'or: "*/music* _musician name - song name_"',
+            'too_long': '‼️ *Oops! Video too long to convert!*\n'
+            'Order something 30 minutes or less.',
         }
 
-        self.check_input(self.user_input, msg)
 
-        pass
+        self.check_input(self.user_input, msg)
 
     def send_message(self, content):
         return bot.sendMessage(self.chat_id, content, reply_to_message_id=self.message_id, parse_mode='Markdown')
@@ -92,12 +89,8 @@ class Chat:
         message_id = message['message_id']
         bot.deleteMessage((chat_id, message_id))
 
-        pass
-
     def send_audio(self, file_name):
         bot.sendAudio(self.chat_id,audio=open(file_name,'rb'), reply_to_message_id=self.message_id)
-
-        pass
 
     def process_request(self, user_input):
         result = Music.search_music(self, user_input[6:])
@@ -122,7 +115,6 @@ class Chat:
                 print("\nError")
 
             os.remove(file_name)
-        pass
 
     def check_input(self, user_input, msg):
         if user_input.startswith('/start'):
@@ -138,9 +130,7 @@ class Chat:
 
         else:
             #Invalid command
-            self.send_message(self.messages['invalid_command'])
-
-        pass 
+            self.send_message(self.messages['invalid_command']) 
 
 def start_new_chat(msg):
     Process(target=Chat, args=(msg,)).start()
